@@ -307,22 +307,6 @@ function prepare_partition() {
 }
 
 function configure_network() {
-    if [ -n "$WIFI_INTERFACE" ]; then
-        cp /etc/netctl/examples/wireless-wpa /etc/netctl
-        chmod 600 /etc/netctl/wireless-wpa
-
-        sed -i 's/^Interface=.*/Interface='"$WIFI_INTERFACE"'/' /etc/netctl/wireless-wpa
-        sed -i 's/^ESSID=.*/ESSID='"$WIFI_ESSID"'/' /etc/netctl/wireless-wpa
-        sed -i 's/^Key=.*/Key='"$WIFI_KEY"'/' /etc/netctl/wireless-wpa
-        if [ "$WIFI_HIDDEN" == "true" ]; then
-            sed -i 's/^#Hidden=.*/Hidden=yes/' /etc/netctl/wireless-wpa
-        fi
-
-        netctl stop-all
-        netctl start wireless-wpa
-        sleep 10
-    fi
-
     ping -c 5 $PING_HOSTNAME
     if [ $? -ne 0 ]; then
         echo "Network ping check failed. Cannot continue."
@@ -485,7 +469,7 @@ function kernels() {
     echo ""
     echo -e "${LIGHT_BLUE}# kernels() step${NC}"
     echo ""
-
+    pacman_install "lvm2"
     pacman_install "linux-headers"
     if [ -n "$KERNELS" ]; then
         pacman_install "$KERNELS"
